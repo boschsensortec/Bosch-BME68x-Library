@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @file    bme68xLibrary.cpp
- * @date    11 Aug 2021
- * @version 1.1.40406
+ * @date    8 Feb 2022
+ * @version 1.1.40407
  *
  */
 
