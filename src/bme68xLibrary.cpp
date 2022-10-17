@@ -628,6 +628,8 @@ int8_t bme68xI2cWrite(uint8_t regAddr, const uint8_t *regData,
 
 /**
  * @brief Function that implements the default I2C read transaction
+ * Read from I2C buffer in chunks of max buffer size if number of bytes
+ * to be read is more than the processor's I2C buffer size.
  */ 
 int8_t bme68xI2cRead(uint8_t regAddr, uint8_t *regData, uint32_t length,
         void *intfPtr) {
@@ -635,24 +637,26 @@ int8_t bme68xI2cRead(uint8_t regAddr, uint8_t *regData, uint32_t length,
     int8_t rslt = BME68X_OK;
     bme68xScommT *comm = NULL;
 
-#ifdef BME68X_I2C_BUFFER_SIZE
-    if (length > BME68X_I2C_BUFFER_SIZE)
-        return BME68X_E_COM_FAIL;
-#endif
-
     if (intfPtr) {
         comm = (bme68xScommT *) intfPtr;
         if (comm->i2c.wireobj) {
-            comm->i2c.wireobj->beginTransmission(comm->i2c.i2cAddr);
-            comm->i2c.wireobj->write(regAddr);
-            if (comm->i2c.wireobj->endTransmission()) {
-                return BME68X_E_COM_FAIL;
-            }
-            comm->i2c.wireobj->requestFrom((int) comm->i2c.i2cAddr,
-                    (int) length);
-            for (i = 0; (i < length) && comm->i2c.wireobj->available(); i++) {
-                regData[i] = comm->i2c.wireobj->read();
-            }
+			comm->i2c.wireobj->beginTransmission(comm->i2c.i2cAddr);
+			comm->i2c.wireobj->write(regAddr);
+			if (comm->i2c.wireobj->endTransmission()) {
+				return BME68X_E_COM_FAIL;
+			}
+
+			uint32_t position = 0;
+			while(length > 0)
+			{		
+				uint32_t lengthTrimmed = length > BME68X_I2C_BUFFER_SIZE ? BME68X_I2C_BUFFER_SIZE : length;
+
+				comm->i2c.wireobj->requestFrom((int) comm->i2c.i2cAddr, (int) lengthTrimmed);
+				for (i = 0; (i < lengthTrimmed); i++) {
+					regData[position++] = comm->i2c.wireobj->read();
+				}
+				length -= lengthTrimmed;
+			}
         } else {
             rslt = BME68X_E_NULL_PTR;
         }
