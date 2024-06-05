@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @file    bme68xLibrary.cpp
- * @date    8 Feb 2022
- * @version 1.1.40407
+ * @date    11 Jan 2023
+ * @version 1.2.40408
  *
  */
 
@@ -51,6 +51,8 @@
 
 #ifdef ARDUINO_ARCH_MBED
 /* Assuming all MBED implementations of Wire have 256 byte sized buffers */
+/* The buffer size needs to be modifed by the user as per the hardware they are using */
+/* Check I2C buffer length in Wire.h of used board in ardunio library folder under wire/src */
 #define BME68X_I2C_BUFFER_SIZE 256
 
 #define BME68X_BURST_SPI_TRANSFER
