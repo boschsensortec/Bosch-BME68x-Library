@@ -24,8 +24,6 @@
 /* Macros used in BME68x_datalogger module */
 #define N_KIT_SENS 8
 #define SD_PIN_CS 33
-//#define SPI_COMM_SPEED 32000000
-//#define SD_MAX_FILES 5
 #define PANIC_LED LED_BUILTIN
 #define PANIC_DUR 1000
 /* measurement duration */
