@@ -15,16 +15,15 @@
  */
 
 #include "Arduino.h"
-#include "FS.h"
 #include "bme68xLibrary.h"
 #include "commMux.h"
-#include <SD.h>
+
+#include <SdFat.h>
+#include <Esp.h>
 
 /* Macros used in BME68x_datalogger module */
 #define N_KIT_SENS 8
 #define SD_PIN_CS 33
-#define SPI_COMM_SPEED 32000000
-#define SD_MAX_FILES 5
 #define PANIC_LED LED_BUILTIN
 #define PANIC_DUR 1000
 /* measurement duration */
@@ -39,6 +38,8 @@ bme68xData sensorData[N_KIT_SENS] = {0};
 String logHeader;
 uint32_t lastLogged = 0;
 
+static SdFat sd;
+
 /**
  * @brief Initializes the sensor and hardware settings
  * Initializes the SD card module
@@ -51,13 +52,14 @@ void setup(void) {
   delay(100);
 
   /* Setting SD Card */
-  if (!SD.begin(SD_PIN_CS, SPI, SPI_COMM_SPEED, "/sd", SD_MAX_FILES)) {
+  if (!sd.begin(SD_PIN_CS, SPI_EIGHTH_SPEED)) {
     Serial.println("SD Card not found");
     panicLeds();
   } else {
-    SD.remove(LOG_FILE_NAME);
-    File file = SD.open(LOG_FILE_NAME, "w");
-    if (!file) {
+    sd.remove(LOG_FILE_NAME);
+    File file;
+    
+    if (!file.open(LOG_FILE_NAME, (O_RDWR | O_CREAT))) {
       Serial.println("Failed to open file for writing");
       panicLeds();
     }
@@ -97,7 +99,7 @@ void setup(void) {
     uint16_t mulProf[10] = {5, 2, 10, 30, 5, 5, 5, 5, 5, 5};
     /* Shared heating duration in milliseconds */
     uint16_t sharedHeatrDur =
-        MEAS_DUR - bme[i].getMeasDur(BME68X_PARALLEL_MODE);
+        MEAS_DUR - (bme[i].getMeasDur(BME68X_PARALLEL_MODE) / INT64_C(1000));
 
     bme[i].setHeaterProf(tempProf, mulProf, sharedHeatrDur, 10);
 
@@ -196,8 +198,9 @@ static void panicLeds(void) {
  */
 static void writeFile(String sensorData) {
 
-  File file = SD.open(LOG_FILE_NAME, FILE_WRITE);
-  if (!file) {
+  File file;
+
+  if (!file.open(LOG_FILE_NAME, (O_RDWR | O_AT_END))) {
     Serial.println("Failed to open file for writing");
     panicLeds();
   }
@@ -214,8 +217,9 @@ static void writeFile(String sensorData) {
  * @param sensorData
  */
 static void appendFile(String sensorData) {
-  File file = SD.open(LOG_FILE_NAME, FILE_APPEND);
-  if (!file) {
+  File file;
+
+  if (!file.open(LOG_FILE_NAME, (O_RDWR | O_AT_END))) {
     Serial.println("Failed to open file for appending");
     panicLeds();
   }
