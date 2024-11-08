@@ -40,15 +40,19 @@
 #define BME68X_LIBRARY_H
 
 #include <string.h>
+
+#ifdef ARDUINO
 #include "Arduino.h"
 #include "Wire.h"
 #include "SPI.h"
+#endif
 
 #include "bme68x/bme68x.h"
 
 #define BME68X_ERROR            INT8_C(-1)
 #define BME68X_WARNING          INT8_C(1)
 
+#ifdef ARDUINO
 /**
  * Datatype working as an interface descriptor
  */
@@ -65,6 +69,7 @@ typedef union
         uint8_t cs;
     } spi;
 } bme68xScommT;
+#endif
 
 /** Datatype to keep consistent with camel casing */
 typedef struct bme68x_data          bme68xData;
@@ -73,6 +78,7 @@ typedef enum   bme68x_intf          bme68xIntf;
 typedef struct bme68x_conf          bme68xConf;
 typedef struct bme68x_heatr_conf    bme68xHeatrConf;
 
+#ifdef ARDUINO
 /**
  * @brief Function that implements the default microsecond delay callback
  * @param periodUs : Duration of the delay in microseconds
@@ -119,6 +125,7 @@ int8_t bme68xI2cWrite(uint8_t regAddr, const uint8_t *regData, uint32_t length, 
  * @return 0 if successful, non-zero otherwise
  */
 int8_t bme68xI2cRead(uint8_t regAddr, uint8_t *regData, uint32_t length, void *intfPtr);
+#endif
 
 class Bme68x
 {
@@ -141,7 +148,8 @@ public:
      */
     void begin(bme68xIntf intf, bme68x_read_fptr_t read, bme68x_write_fptr_t write,
             bme68x_delay_us_fptr_t idleTask, void *intfPtr);
-
+            
+#ifdef ARDUINO
     /**
      * @brief Function to initialize the sensor based on the Wire library
      * @param i2cAddr  : The I2C address the sensor is at
@@ -157,6 +165,7 @@ public:
      * @param idleTask   : Delay or Idle function
      */
     void begin(uint8_t chipSelect, SPIClass &spi, bme68x_delay_us_fptr_t idleTask = bme68xDelayUs);
+#endif
 
     /**
      * @brief Function to read a register
@@ -324,18 +333,21 @@ public:
      * @return -1 if an error occurred, 1 if warning occured else 0
      */
     int8_t checkStatus(void);
-
+#ifdef ARDUINO
     /**
      * @brief Function to get a brief text description of the error
      * @return Returns a string describing the error code
      */
     String statusString(void);
+#endif
 
 private:
     /** Datatype to keep consistent with camel casing
      * Datastructure to hold sensor settings
      */
+#ifdef ARDUINO
     bme68xScommT comm;
+#endif
     bme68xDev bme6;
     bme68xConf conf;
     bme68xHeatrConf heatrConf;

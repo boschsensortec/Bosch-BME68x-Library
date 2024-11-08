@@ -101,10 +101,12 @@
 
 Bme68x::Bme68x(void)
 {
+#ifdef ARDUINO
 	comm.i2c.wireobj = NULL;
 	comm.i2c.i2cAddr = 0;
 	comm.spi.spiobj = NULL;
 	comm.spi.cs = 0;
+#endif
 	status = BME68X_OK;
 	memset(&bme6, 0, sizeof(bme6));
 	memset(&conf, 0, sizeof(conf));
@@ -136,6 +138,7 @@ void Bme68x::begin(bme68xIntf intf, bme68x_read_fptr_t read, bme68x_write_fptr_t
 /**
  * @brief Function to initialize the sensor based on the Wire library
  */
+#ifdef ARDUINO
 void Bme68x::begin(uint8_t i2cAddr, TwoWire &i2c, bme68x_delay_us_fptr_t idleTask)
 {
 	comm.i2c.i2cAddr = i2cAddr;
@@ -172,6 +175,7 @@ void Bme68x::begin(uint8_t chipSelect, SPIClass &spi, bme68x_delay_us_fptr_t idl
 
 	status = bme68x_init(&bme6);
 }
+#endif
 
 /**
  * @brief Function to read a register
@@ -479,6 +483,7 @@ int8_t Bme68x::checkStatus(void)
 	}
 }
 
+#ifdef ARDUINO
 /**
  * @brief Function to get a brief text description of the error
  */
@@ -517,6 +522,7 @@ String Bme68x::statusString(void)
 
 	return ret;
 }
+
 
 /**
  * @brief Function that implements the default microsecond delay callback
@@ -664,3 +670,4 @@ int8_t bme68xI2cRead(uint8_t regAddr, uint8_t *regData, uint32_t length,
 
     return rslt;
 }
+#endif

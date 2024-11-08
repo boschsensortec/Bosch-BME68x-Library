@@ -1,0 +1,19 @@
+{
+  "name": "BME68x Sensor library",
+  "description": "Bosch Sensortec BME680 and BME688 sensor library",
+  "homepage": "https://www.bosch-sensortec.com/software-tools/software/bme688-software/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boschsensortec/Bosch-BME68x-Library"
+  },
+  "version": "1.2.40408",
+  "authors": {
+    "name": "Bosch Sensortec",
+    "email": "contact@bosch-sensortec.com"
+  },
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "includeDir": "src/bme68x"
+  }
+}
