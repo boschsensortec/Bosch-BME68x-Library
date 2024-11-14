@@ -523,7 +523,7 @@ String Bme68x::statusString(void)
 	return ret;
 }
 
-
+#ifdef ARDUINO
 /**
  * @brief Function that implements the default microsecond delay callback
  */
@@ -531,6 +531,7 @@ void bme68xDelayUs(uint32_t periodUs, void *intfPtr) {
     (void) intfPtr;
     delayMicroseconds(periodUs);
 }
+#endif
 
 /**
  * @brief Function that implements the default SPI write transaction
