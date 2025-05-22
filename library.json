@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/boschsensortec/Bosch-BME68x-Library"
   },
-  "version": "1.2.40408",
+  "version": "1.3.40408",
   "authors": {
     "name": "Bosch Sensortec",
     "email": "contact@bosch-sensortec.com"
